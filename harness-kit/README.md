@@ -18,10 +18,14 @@ stack-agnostic, JSON-Schema-validated. Designed to be installed once with
 ## Install
 
 ```
-npx skills add <owner>/harness-kit
+npx skills add JuanSebastianGB/harness-kit
 ```
 
-For a specific version: `npx skills add <owner>/harness-kit@v0.1.0`.
+Recommended for repeatable installs: pin to a tag.
+
+```
+npx skills add JuanSebastianGB/harness-kit@v0.1.0
+```
 
 ## Quick start
 
