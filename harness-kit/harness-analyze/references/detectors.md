@@ -30,6 +30,30 @@ confidence floor. Confidence defaults to 0.8 if not stated.
 | Project skills | `.agents/skills/`, `.claude/skills/`, `skills/` | `existing_harness.skills[]` |
 | Project agents | `.agents/agents/`, `agents/*.md` | `existing_harness.agents[]` |
 
+### Sensor hints
+
+Scan the following signals to detect existing read-only perception tools.
+Each match populates `existing_harness.constraints.read_only_tools[]`:
+
+| Signal | Look in | Example match | Confidence |
+|---|---|---|---|
+| Env-var reference to sensor data | `CLAUDE.md`, `AGENTS.md`, `.env`, `docker-compose.yml` | `TEMPERATURE_API_KEY`, `HUMIDITY_ENDPOINT`, `IO_BUS` | 0.8 |
+| Tool/function declared as read-only | `AGENTS.md`, `skills/*.md`, prompt files | description containing "reads", "fetches", "queries", "lists" with no write verbs | 0.7 |
+| Sensor capability request | Agent `purpose` or prompt file | "monitor temperature", "poll sensor", "observe metrics" | 0.7 |
+| HTTP GET / file-read tool declaration | `.claude/settings.json`, `CLAUDE.md` | `tool: Read`, `tool: glob`, `tool: Grep`, `"http.get"`, `"file.read"` | 0.85 |
+
+### Sandbox hints
+
+Scan for existing action-perimeter constraints. Each match populates
+`existing_harness.constraints.sandbox_signals[]`:
+
+| Signal | Look in | Example match | Confidence |
+|---|---|---|---|
+| Bash exec scope restriction | `CLAUDE.md`, `AGENTS.md`, config files | `allowedCommands`, `blockedCommands`, `denylist`, `exec: none` | 0.8 |
+| File-write allowlist | `CLAUDE.md`, `skills/*.md` | `allowedPaths`, `writeScope: ["src/"]`, `"only write to tests/"` | 0.8 |
+| Network egress rules | `.claude/settings.json`, `CLAUDE.md` | `networkAccess: none`, `"no internet"`, `egress: deny`, `offline` | 0.85 |
+| Approval-gated actions | `AGENTS.md`, prompt files | `requiresApproval`, `"ask before"`, `confirmSteps`, `human-in-the-loop` | 0.75 |
+
 ## Conventions
 
 | Detector | File | Field |

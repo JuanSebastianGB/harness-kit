@@ -33,14 +33,40 @@ proposal".
      `reason: "versioned policy cap reached"`.
 5. **Refuse path traversal.** Every output path must resolve under
    `<repo-root>` after normalizing. Reject `..` escapes and absolute paths.
-6. **Render content.** Keep AGENTS.md portable (no vendor-specific
-   prose); include detected conventions as a thin table. Each agent prompt
-   is a Markdown file with frontmatter (`name`, `description` only). Do not
-   emit `allowed-tools` or any vendor-specific field; put tool declarations
-   inside an opt-in `<!-- agent-specific -->` fenced block.
-7. **Compute shas.** For each file produced, the leading 16 hex chars of the
-   sha256 of the written bytes.
-8. **Write envelope.** `<repo-root>/.harness-kit/render.json`.
+ 6. **Render content.** Keep AGENTS.md portable (no vendor-specific
+    prose); include detected conventions as a thin table. Each agent prompt
+    is a Markdown file with frontmatter (`name`, `description` only). Do not
+    emit `allowed-tools` or any vendor-specific field; put tool declarations
+    inside an opt-in `<!-- agent-specific -->` fenced block.
+ 7. **Emit Sensors & Sandbox section (conditional).** If the agent proposal
+    carries any of `sensors` (non-empty) or `sandbox` (any sub-field defined),
+    emit a `## Sensors & Sandbox` block in the agent's prompt file. Canonicalize
+    before emitting: sort `sensors[]` lexicographically, sort every sub-array
+    of `sandbox{}` lexicographically, render keys in fixed order:
+    `allowed_paths`, `denied_commands`, `network_access`, `requires_approval`.
+    If both `sensors` and `sandbox` are absent/empty, omit the section entirely.
+
+    **Example (populated):**
+    ```markdown
+    ## Sensors & Sandbox
+
+    ### Sensors
+    - file.read
+    - glob.list
+    - grep.regex
+
+    ### Sandbox
+    - **allowed_paths**: `src/`, `tests/`
+    - **denied_commands**: `rm -rf`, `sudo`
+    - **network_access**: `none`
+    - **requires_approval**: `package.publish`
+    ```
+
+    **Example (absent):**
+    _No `## Sensors & Sandbox` block appears in the agent's prompt file._
+ 8. **Compute shas.** For each file produced, the leading 16 hex chars of the
+    sha256 of the written bytes.
+ 9. **Write envelope.** `<repo-root>/.harness-kit/render.json`.
 
 ## Output
 

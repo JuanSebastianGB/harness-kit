@@ -35,6 +35,7 @@ any good", or similar.
 - **Convention adherence**: detected conventions are reflected in the
   harness (e.g. if project uses ruff, the harness references ruff)
 - **Drift**: files referenced in `prompt_path` exist with non-trivial content
+- **Sandbox/sensor completeness**: see `references/detectors.md#Lens: sandbox-sensor warnings`
 
 ## Output
 

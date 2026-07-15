@@ -25,8 +25,12 @@ their harness is improving.
    0, 0.5, or 1. Use the rubric in the "Scoring rubric" section of
    `references/detectors.md`.
 4. **Compute `golden_suite_score`.** Sum-of-scores / case-count.
-5. **Compute `diff_from_previous`** if a prior eval exists.
-6. **Write envelope.** `<repo-root>/.harness-kit/eval.json`.
+ 5. **Run sandbox-respect determinism check.** For the `sandbox-respect` case
+    (added in v0.2.0 golden suite), assert byte-identical output across 3
+    consecutive re-runs. Scoring follows the rubric in
+    `references/detectors.md#Scoring rubric`.
+6. **Compute `diff_from_previous`** if a prior eval exists.
+7. **Write envelope.** `<repo-root>/.harness-kit/eval.json`.
 
 ## Suitability for BLOCKED review
 

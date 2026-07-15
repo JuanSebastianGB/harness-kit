@@ -36,6 +36,16 @@ modified between render and review).
 Re-run the secret-detection rules from `harness-analyze/references/detectors.md#secret-scrubbing`
 against the rendered content. Any hit → `blocker`.
 
+## Lens: sandbox-sensor warnings
+
+Two hardcoded advisory rules that emit `severity: "warning"` under the
+existing review schema. No new statuses or verdicts are introduced.
+
+| Rule | Condition | Issue ID | Severity |
+|---|---|---|---|
+| Missing sandbox on write-capable agent | `tools[]` contains a write verb (`Write`, `Edit`, `Create`, `Patch`, `Delete`) AND `sandbox{}` is absent or empty | `missing-sandbox-write` | `warning` |
+| Insufficient sensors for perception purpose | `purpose` mentions perception verbs (`read`, `glob`, `grep`, `inspect`, `query`, `monitor`, `poll`, `observe`) AND `sensors` is absent or empty | `insufficient-sensors` | `warning` |
+
 ## Severity escalation
 
 - `secret leaked` → `blocker`
