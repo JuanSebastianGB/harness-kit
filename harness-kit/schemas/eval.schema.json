@@ -31,6 +31,10 @@
           "type": "string",
           "format": "date-time"
         },
+        "previous_run_id": {
+          "type": ["string", "null"],
+          "$comment": "If set, signals to the next consumer (propose) which prior run was used as input."
+        },
         "data": {
           "$ref": "#/$defs/eval-data"
         }

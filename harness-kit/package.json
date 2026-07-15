@@ -1,0 +1,18 @@
+{
+  "name": "harness-kit",
+  "version": "0.1.0",
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "bun-types": "^1.3.14",
+    "typescript": "^5.0.0"
+  },
+  "description": "Curated kit of 6 SKILL.md files for building AI harnesses iteratively.",
+  "scripts": {
+    "test": "bun test tests/",
+    "test:pipeline": "bun test tests/pipeline.test.mjs",
+    "test:schemas": "bun test tests/schema-gates.test.mjs",
+    "test:secrets": "bun test tests/secret-scrubbing.test.mjs",
+    "test:frontmatter": "bun test tests/frontmatter-lint.test.mjs"
+  },
+  "type": "module"
+}
