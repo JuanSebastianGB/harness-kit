@@ -69,6 +69,40 @@
           "items": {
             "type": "string"
           }
+        },
+        "sensors": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$" },
+          "uniqueItems": true,
+          "maxItems": 32,
+          "description": "Read-only perception tools. Sorted lexicographically at render time for determinism."
+        },
+        "sandbox": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "allowed_paths": {
+              "type": "array",
+              "items": { "type": "string", "pattern": "^(?!/)(?!.*\\.\\.)(?![A-Za-z]:)[A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)*$" },
+              "uniqueItems": true,
+              "maxItems": 32
+            },
+            "denied_commands": {
+              "type": "array",
+              "items": { "type": "string" },
+              "uniqueItems": true,
+              "maxItems": 64
+            },
+            "network_access": {
+              "enum": ["none", "read_only", "full"]
+            },
+            "requires_approval": {
+              "type": "array",
+              "items": { "type": "string" },
+              "uniqueItems": true,
+              "maxItems": 32
+            }
+          }
         }
       },
       "additionalProperties": false
@@ -153,5 +187,5 @@
       "additionalProperties": false
     }
   },
-  "$comment": "Replace $id at publish with: https://raw.githubusercontent.com/<owner>/harness-kit/<ref>/schemas/propose.schema.json"
+  "$comment": "v0.2.0 — added sensors & sandbox blocks. Replace $id at publish with: https://raw.githubusercontent.com/<owner>/harness-kit/<ref>/schemas/propose.schema.json"
 }
