@@ -62,6 +62,20 @@ test("proposal with sandbox{} validates", () => {
   expect(r.ok).toBe(true);
 });
 
+test("validate_propose_with_invalid_network_access — rejected", () => {
+  const doc = envelope([
+    {
+      name: "open-net-agent",
+      purpose: "Denies open network",
+      prompt_path: "agents/open-net.md",
+      sandbox: { network_access: "open" },
+    },
+  ]);
+  const r = propose(doc);
+  expect(r.ok).toBe(false);
+  expect(r.errors.some((e) => e.includes('"open"'))).toBe(true);
+});
+
 test("validate_propose_sensors_sorted_deterministically", () => {
   // Schema accepts unsorted input; canonicalization is render-time.
   // This test asserts the schema accepts ["b","a"] — determinism is
