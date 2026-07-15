@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "harness-kit eval output",
+  "$defs": {
+    "output": {
+      "type": "object",
+      "required": [
+        "$schema",
+        "contract_version",
+        "run_id",
+        "stage",
+        "produced_at",
+        "data"
+      ],
+      "properties": {
+        "$schema": {
+          "const": "eval.schema.json#/$defs/output"
+        },
+        "contract_version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        },
+        "run_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "stage": {
+          "const": "eval"
+        },
+        "produced_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "data": {
+          "$ref": "#/$defs/eval-data"
+        }
+      },
+      "additionalProperties": false
+    },
+    "case-score": {
+      "type": "object",
+      "required": [
+        "case",
+        "score",
+        "max"
+      ],
+      "properties": {
+        "case": {
+          "type": "string"
+        },
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "max": {
+          "const": 1
+        },
+        "notes": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "eval-data": {
+      "type": "object",
+      "required": [
+        "status",
+        "suite",
+        "golden_suite_score",
+        "scores"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "OK",
+            "INSUFFICIENT_EVIDENCE",
+            "ERROR",
+            "BLOCKED"
+          ]
+        },
+        "suite": {
+          "type": "string",
+          "pattern": "^v?[0-9]+\\.[0-9]+\\.[0-9]+$"
+        },
+        "golden_suite_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "scores": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/case-score"
+          }
+        },
+        "diff_from_previous": {
+          "type": "object",
+          "properties": {
+            "previous_run_id": {
+              "type": "string"
+            },
+            "golden_suite_score_delta": {
+              "type": "number"
+            },
+            "regressions": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "improvements": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "notes": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$comment": "Replace $id at publish with: https://raw.githubusercontent.com/<owner>/harness-kit/<ref>/schemas/eval.schema.json"
+}

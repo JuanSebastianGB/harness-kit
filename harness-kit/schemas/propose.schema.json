@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "harness-kit propose output",
+  "$defs": {
+    "output": {
+      "type": "object",
+      "required": [
+        "$schema",
+        "contract_version",
+        "run_id",
+        "stage",
+        "produced_at",
+        "data"
+      ],
+      "properties": {
+        "$schema": {
+          "const": "propose.schema.json#/$defs/output"
+        },
+        "contract_version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        },
+        "run_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "stage": {
+          "const": "propose"
+        },
+        "produced_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "previous_run_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "$ref": "#/$defs/propose-data"
+        }
+      },
+      "additionalProperties": false
+    },
+    "agent-proposal": {
+      "type": "object",
+      "required": [
+        "name",
+        "purpose",
+        "prompt_path"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+        },
+        "purpose": {
+          "type": "string",
+          "maxLength": 1024
+        },
+        "prompt_path": {
+          "type": "string",
+          "pattern": "^(?!/)(?!.*\\.\\.)(?!.*//)[A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)*$"
+        },
+        "tools": {
+          "$comment": "Portable tool list. Render keeps it inside an opt-in fenced block per agent-specific syntax; emit nothing by default.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "skill-proposal": {
+      "type": "object",
+      "required": [
+        "name",
+        "purpose",
+        "triggers"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+        },
+        "purpose": {
+          "type": "string",
+          "maxLength": 1024
+        },
+        "triggers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "propose-data": {
+      "type": "object",
+      "required": [
+        "status",
+        "agents",
+        "skills",
+        "rejected_proposals"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "OK",
+            "INSUFFICIENT_EVIDENCE",
+            "ERROR",
+            "BLOCKED"
+          ]
+        },
+        "agents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/agent-proposal"
+          }
+        },
+        "skills": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/skill-proposal"
+          }
+        },
+        "rejected_proposals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "reason"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "notes": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$comment": "Replace $id at publish with: https://raw.githubusercontent.com/<owner>/harness-kit/<ref>/schemas/propose.schema.json"
+}

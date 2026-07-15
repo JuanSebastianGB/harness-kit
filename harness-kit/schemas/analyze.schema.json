@@ -1,0 +1,244 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "harness-kit analyze output",
+  "$defs": {
+    "output": {
+      "type": "object",
+      "required": [
+        "$schema",
+        "contract_version",
+        "run_id",
+        "stage",
+        "produced_at",
+        "data"
+      ],
+      "properties": {
+        "$schema": {
+          "const": "analyze.schema.json#/$defs/output"
+        },
+        "contract_version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        },
+        "run_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "stage": {
+          "const": "analyze"
+        },
+        "produced_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "data": {
+          "$ref": "#/$defs/analyze-data"
+        }
+      },
+      "additionalProperties": false
+    },
+    "conflict-entry": {
+      "type": "object",
+      "required": [
+        "field",
+        "values",
+        "severity"
+      ],
+      "properties": {
+        "field": {
+          "type": "string"
+        },
+        "values": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "object",
+            "required": [
+              "value",
+              "source",
+              "confidence"
+            ],
+            "properties": {
+              "value": {},
+              "source": {
+                "type": "string"
+              },
+              "confidence": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "severity": {
+          "enum": [
+            "info",
+            "warn",
+            "block"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "coverage": {
+      "type": "object",
+      "required": [
+        "evidence_paths",
+        "evidence_redacted_paths",
+        "absolute_paths_checked"
+      ],
+      "properties": {
+        "evidence_paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "evidence_redacted_paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "absolute_paths_checked": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "analyze-data": {
+      "type": "object",
+      "required": [
+        "status",
+        "stack",
+        "entry_points",
+        "existing_harness",
+        "conventions",
+        "shape",
+        "conflicts",
+        "coverage"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "OK",
+            "INSUFFICIENT_EVIDENCE",
+            "ERROR",
+            "BLOCKED"
+          ]
+        },
+        "stack": {
+          "type": "object",
+          "properties": {
+            "languages": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "package_manager": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "framework": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "entry_points": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "command"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "command": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "existing_harness": {
+          "type": "object",
+          "properties": {
+            "agents_md": {
+              "type": "boolean"
+            },
+            "skills": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "agents": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "conventions": {
+          "type": "object",
+          "properties": {
+            "formatter": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "linter": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "test_runner": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "shape": {
+          "enum": [
+            "single",
+            "monorepo",
+            "unknown"
+          ]
+        },
+        "conflicts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/conflict-entry"
+          }
+        },
+        "coverage": {
+          "$ref": "#/$defs/coverage"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$comment": "Replace $id at publish with: https://raw.githubusercontent.com/<owner>/harness-kit/<ref>/schemas/analyze.schema.json"
+}

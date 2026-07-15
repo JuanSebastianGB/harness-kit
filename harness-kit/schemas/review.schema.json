@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "harness-kit review output",
+  "$defs": {
+    "output": {
+      "type": "object",
+      "required": [
+        "$schema",
+        "contract_version",
+        "run_id",
+        "stage",
+        "produced_at",
+        "data"
+      ],
+      "properties": {
+        "$schema": {
+          "const": "review.schema.json#/$defs/output"
+        },
+        "contract_version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        },
+        "run_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "stage": {
+          "const": "review"
+        },
+        "produced_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "data": {
+          "$ref": "#/$defs/review-data"
+        }
+      },
+      "additionalProperties": false
+    },
+    "issue": {
+      "type": "object",
+      "required": [
+        "id",
+        "severity",
+        "evidence",
+        "fix_hint"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "blocker",
+            "critical",
+            "warning",
+            "suggestion"
+          ],
+          "$comment": "Severity values mirror the kit convention: lowercase by design (blocker|critical|warning|suggestion), distinct from the UPPERCASE status enum (OK|INSUFFICIENT_EVIDENCE|ERROR|BLOCKED)."
+        },
+        "evidence": {
+          "type": "string"
+        },
+        "fix_hint": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "review-data": {
+      "type": "object",
+      "required": [
+        "status",
+        "verdict",
+        "issues",
+        "severity_counts"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "OK",
+            "INSUFFICIENT_EVIDENCE",
+            "ERROR",
+            "BLOCKED"
+          ]
+        },
+        "verdict": {
+          "enum": [
+            "approve",
+            "request-changes"
+          ]
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/issue"
+          }
+        },
+        "severity_counts": {
+          "type": "object",
+          "required": [
+            "blocker",
+            "critical",
+            "warning",
+            "suggestion"
+          ],
+          "properties": {
+            "blocker": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "critical": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "warning": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "suggestion": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false
+        },
+        "reviewed_file": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$comment": "Replace $id at publish with: https://raw.githubusercontent.com/<owner>/harness-kit/<ref>/schemas/review.schema.json"
+}

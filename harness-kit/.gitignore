@@ -1,0 +1,4 @@
+# Per-project state produced by the harness-kit pipeline.
+# Each project that uses the kit gets its own .harness-kit/ directory at root.
+
+.harness-kit/
