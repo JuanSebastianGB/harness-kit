@@ -1,6 +1,6 @@
 # Harness Kit Contract
 
-`contract_version: 0.1.0` — unstable, expected to break before 1.0.
+`contract_version: 0.2.0` — unstable, expected to break before 1.0.
 
 This document is the human-readable index of the contract. The machine-readable
 schemas live in `schemas/` as one JSON Schema per pipeline stage:
@@ -37,6 +37,33 @@ Every stage writes its output to:
 `<repo-root>` is the directory the user supplied as the project being analyzed.
 Output is gitignored. The `.harness-kit/` directory is the only state shared
 between stages.
+
+## Sandbox & Sensors
+
+v0.2.0 adds two OPTIONAL first-class fields to `agent-proposal` that describe
+the agent's perception surface and action perimeter:
+
+- **`sensors`** (`string[]`, optional, max 32). Read-only perception tools
+  (file reads, HTTP GET, env queries). Each item must match
+  `^[a-z0-9][a-z0-9._-]*$`. Sorted lexicographically at render time for
+  determinism.
+
+- **`sandbox`** (`object`, optional) with four optional sub-fields:
+  - `allowed_paths` (`string[]`, max 32) — relative-path patterns.
+  - `denied_commands` (`string[]`, max 64) — exact-match substrings.
+  - `network_access` (enum: `"none" | "read_only" | "full"`).
+  - `requires_approval` (`string[]`, max 32).
+
+**Canonicalization rules (determinism invariant):**
+- `sensors[]`: sort entries with `localeCompare`.
+- `sandbox{}` sub-arrays: sort every string array with `localeCompare`.
+- `sandbox{}` key order: `allowed_paths`, `denied_commands`, `network_access`,
+  `requires_approval`.
+- Three consecutive runs on the same input produce byte-identical output.
+
+**Migration:** v0.1.0 fixtures without `sensors` or `sandbox` continue to
+validate. Both fields are optional. Downstream users who want the new behavior
+must bump their kit pin to `@v0.2.0` (or `@latest`).
 
 ## Envelope
 
@@ -95,5 +122,5 @@ canonical human index.
 
 ## License
 
-MIT. See `LICENSE`. **Disclaimer:** `contract_version: 0.1.0` is unstable.
+MIT. See `LICENSE`. **Disclaimer:** `contract_version: 0.2.0` is unstable.
 Breaking changes without a migration path are possible until `1.0.0`.
