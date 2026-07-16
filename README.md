@@ -75,4 +75,4 @@ There is no `CONTRIBUTING.md` yet; PR review is the current gate.
 
 ## License
 
-[MIT](./harness-kit/LICENSE) — Copyright (c) 2026 Juan Sebastian Garcia.
+[MIT](./harness-kit/LICENSE) — Copyright (c) 2026 Juan Sebastian Gonzalez.
