@@ -1,0 +1,217 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "harness-kit code emission manifest",
+  "$defs": {
+    "output": {
+      "anyOf": [
+        { "$ref": "#/$defs/manifest-output" },
+        { "$ref": "#/$defs/envelope-output" }
+      ]
+    },
+    "manifest-output": {
+      "type": "object",
+      "required": [
+        "manifest_version",
+        "target_stack",
+        "files",
+        "constraints_inherited"
+      ],
+      "properties": {
+        "manifest_version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        },
+        "target_stack": {
+          "$ref": "#/$defs/target-stack"
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/manifest-file"
+          }
+        },
+        "constraints_inherited": {
+          "$ref": "#/$defs/constraints"
+        },
+        "exports": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/export-entry"
+          }
+        },
+        "stack_extensions": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "envelope-output": {
+      "type": "object",
+      "required": [
+        "contract_version",
+        "run_id",
+        "stage",
+        "produced_at",
+        "data"
+      ],
+      "properties": {
+        "contract_version": {
+          "type": "string"
+        },
+        "run_id": {
+          "type": "string"
+        },
+        "stage": {
+          "type": "string"
+        },
+        "produced_at": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": false
+    },
+    "target-stack": {
+      "type": "object",
+      "required": [
+        "language"
+      ],
+      "properties": {
+        "language": {
+          "type": "string",
+          "enum": [
+            "typescript",
+            "python",
+            "go",
+            "ruby",
+            "rust",
+            "unknown"
+          ]
+        },
+        "runtime": {
+          "type": "string"
+        },
+        "framework": {
+          "type": "string"
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "package_manager": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "manifest-file": {
+      "type": "object",
+      "required": [
+        "path",
+        "kind"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^(?!.*\\.\\.)(?!/).+$"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "source",
+            "test",
+            "config",
+            "tool-implementation"
+          ]
+        },
+        "description": {
+          "type": "string"
+        },
+        "intent": {
+          "type": "string"
+        },
+        "sandbox_inherits_from_propose": {
+          "type": "boolean"
+        },
+        "exports": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/export-entry"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "constraints": {
+      "type": "object",
+      "properties": {
+        "sensors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "sandbox": {
+          "$ref": "#/$defs/sandbox"
+        }
+      },
+      "additionalProperties": false
+    },
+    "sandbox": {
+      "type": "object",
+      "properties": {
+        "allowed_paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "denied_commands": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "network_access": {
+          "type": "string",
+          "enum": [
+            "none",
+            "outbound",
+            "full",
+            "read_only"
+          ]
+        },
+        "requires_approval": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "max_file_size_mb": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false
+    },
+    "export-entry": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$comment": "Replace $id at publish with: https://raw.githubusercontent.com/<owner>/harness-kit/<ref>/schemas/code-emission-manifest.schema.json"
+}

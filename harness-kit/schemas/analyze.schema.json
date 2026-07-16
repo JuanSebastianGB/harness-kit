@@ -233,6 +233,37 @@
             "$ref": "#/$defs/conflict-entry"
           }
         },
+        "target_stack": {
+          "type": "object",
+          "required": [
+            "language",
+            "confidence"
+          ],
+          "properties": {
+            "language": {
+              "enum": [
+                "typescript",
+                "python",
+                "go",
+                "ruby",
+                "rust",
+                "unknown"
+              ]
+            },
+            "runtime": {
+              "type": "string"
+            },
+            "framework": {
+              "type": "string"
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          },
+          "additionalProperties": false
+        },
         "coverage": {
           "$ref": "#/$defs/coverage"
         }

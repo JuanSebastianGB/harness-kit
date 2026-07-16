@@ -1,5 +1,39 @@
 # Changelog
 
+## [0.3.0] — 2026-07-15
+
+### INCOMPATIBLE CHANGES
+- None — manifest is optional, v0.2.0 fixtures without it remain valid
+
+### Migration
+- None — no breaking changes
+
+### Added
+- `harness-emit-code/` — 6th pipeline stage for executable code generation
+  - `SKILL.md` — orchestrator prompt with dispatch logic and validation tiers
+  - `references/contract.md` — stage contract with inputs, outputs, backward compat
+  - `references/detectors.md` — 6 failure detection patterns
+  - `references/edge-cases.md` — 10 edge cases with handling guidance
+  - `references/adapters/typescript.md` — TypeScript adapter with assertSandbox pattern
+- `schemas/code-emission-manifest.schema.json` — JSON Schema for emit-code manifest
+- `harness-analyze/` — target_stack detection (language, runtime, framework, confidence)
+- `harness-render-agents-md/` — manifest.json emission alongside AGENTS.md
+- `harness-review/` — emit-code review lens (warnings only, never gates)
+- `harness-eval/` — Tier-1 (surface) and Tier-2 (compile) eval for emitted code
+
+### Changed
+- Pipeline: 5-stage → 6-stage (analyze→propose→render→emit-code→review→eval)
+- `kit-contract.md`: full v0.3.0 sync — §emit-code, §Adapter System, §Manifest expanded
+- All 6 per-stage `references/contract.md`: version bumped to 0.3.0, pipeline diagrams updated
+
+### Added tests
+- `tests/manifest-schema.test.mjs` — 7 tests: manifest validation, backward compat
+- `tests/emit-code-roundtrip.test.mjs` — 5 tests: manifest roundtrip, path traversal
+- `tests/adapter-presence.test.mjs` — 3 tests: adapter file existence, frontmatter
+- `tests/tsc-no-emit.test.mjs` — 2 tests: inline assertSandbox fixture, tsc compile gate
+- `tests/emit-import-resolve.test.mjs` — 3 tests: output directory, file existence, import resolve
+- `tests/diff_check_contract_sync.test.mjs` — +2 tests: schema ref in contracts
+
 ## 0.2.0 — sensors and sandbox
 
 ### INCOMPATIBLE CHANGES

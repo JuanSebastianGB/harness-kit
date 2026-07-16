@@ -17,19 +17,33 @@ None. The skill reads the repository rooted at the supplied path.
 2. **Walk the tree under the denylist.** Skip every glob in
    `references/detectors.md#denylist`. SKILL.md does NOT redeclare the
    denylist; references is the single source of truth.
-3. **Detect stack signals.** Per `references/detectors.md`. Map each detector to a confidence value (0.0-1.0).
-4. **Detect existing harness.** Look for `AGENTS.md`, `.agents/`, `.claude/`, `skills/`, `agents/` directories.
-5. **Detect entry points.** Scripts from `package.json`, `pyproject.toml`, `Makefile`, `justfile`, etc.
- 6. **Detect sensor/sandbox signals.** Scan the supplied path for read-only
+ 3. **Detect stack signals.** Per `references/detectors.md`. Map each detector to a confidence value (0.0-1.0).
+ 4. **Detect target_stack (language / runtime / framework).** After stack signals, derive a
+    `target_stack` object from the lockfile / marker-file evidence using these deterministic rules
+    (listed in priority order — the FIRST match wins; if multiple contradict, emit a conflict):
+    - `bun.lock` or `bun.lockb` → language: `typescript`, runtime: `bun`, confidence: 0.9
+    - `yarn.lock` + `tsconfig.json` → language: `typescript`, runtime: `node`, confidence: 0.8
+    - `package-lock.json` + `tsconfig.json` → language: `typescript`, runtime: `node`, confidence: 0.7
+    - `go.mod` → language: `go`, runtime: null, confidence: 0.9
+    - `Cargo.toml` → language: `rust`, runtime: null, confidence: 0.9
+    - `requirements.txt` or `pyproject.toml` → language: `python`, runtime: null, confidence: 0.8
+    - `Gemfile` → language: `ruby`, runtime: null, confidence: 0.7
+    - No lockfile detected → language: `unknown`, runtime: null, confidence: 0.2
+    Framework is detected from `stack.framework` (populated by detectors in step 3) and copied into
+    `target_stack.framework`. If `stack.framework` is null, `target_stack.framework` is omitted.
+    The `target_stack` is emitted as a top-level field in `data` alongside `stack`, not replacing it.
+ 5. **Detect existing harness.** Look for `AGENTS.md`, `.agents/`, `.claude/`, `skills/`, `agents/` directories.
+ 6. **Detect entry points.** Scripts from `package.json`, `pyproject.toml`, `Makefile`, `justfile`, etc.
+ 7. **Detect sensor/sandbox signals.** Scan the supplied path for read-only
     perception tools (file reads, HTTP GET, env queries) listed in
     `CLAUDE.md`, `AGENTS.md`, `.claude/settings.json`, or `skills/`.
     Map each match to `existing_harness.constraints` per
     `references/detectors.md#Existing harness`.
- 7. **Detect conventions.** Formatter (prettier/biome/black/gofmt/rustfmt), linter (eslint/ruff/golangci), test runner.
- 8. **Record coverage.** `coverage.absolute_paths_checked`, `coverage.evidence_paths`, `coverage.evidence_redacted_paths`.
- 9. **Compute conflicts.** For each field with >1 inference, build a `conflict-entry` per `references/edge-cases.md#conflicts`. Set `severity: block` when the conflict would change downstream prose (e.g. conflicting language); `warn` for soft preferences; `info` otherwise.
- 10. **Compute status.** `INSUFFICIENT_EVIDENCE` if `data.stack.languages` is empty or null after confidence threshold; `BLOCKED` if any `conflict-entry.severity == block`; otherwise `OK`.
- 11. **Write envelope.** `<repo-root>/.harness-kit/analyze.json` per `references/contract.md`.
+ 8. **Detect conventions.** Formatter (prettier/biome/black/gofmt/rustfmt), linter (eslint/ruff/golangci), test runner.
+ 9. **Record coverage.** `coverage.absolute_paths_checked`, `coverage.evidence_paths`, `coverage.evidence_redacted_paths`.
+ 10. **Compute conflicts.** For each field with >1 inference, build a `conflict-entry` per `references/edge-cases.md#conflicts`. Set `severity: block` when the conflict would change downstream prose (e.g. conflicting language); `warn` for soft preferences; `info` otherwise.
+ 11. **Compute status.** `INSUFFICIENT_EVIDENCE` if `data.stack.languages` is empty or null after confidence threshold; `BLOCKED` if any `conflict-entry.severity == block`; otherwise `OK`.
+ 12. **Write envelope.** `<repo-root>/.harness-kit/analyze.json` per `references/contract.md`.
 
 ## Output
 

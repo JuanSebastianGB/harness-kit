@@ -1,6 +1,6 @@
 # Harness Kit Contract
 
-`contract_version: 0.2.0` — unstable, expected to break before 1.0.
+`contract_version: 0.3.0` — unstable, expected to break before 1.0.
 
 This document is the human-readable index of the contract. The machine-readable
 schemas live in `schemas/` as one JSON Schema per pipeline stage:
@@ -10,15 +10,17 @@ schemas live in `schemas/` as one JSON Schema per pipeline stage:
 - `schemas/render.schema.json`
 - `schemas/review.schema.json`
 - `schemas/eval.schema.json`
+- `schemas/code-emission-manifest.schema.json` (v0.3.0)
 
-Each stage of the kit produces a single JSON file consumed by the next stage.
+Each stage of the kit produces JSON files consumed by the next stage. The
+render stage produces TWO outputs: an internal envelope and a public manifest.
 
 ## Pipeline
 
 ```
-harness-analyze -> harness-propose -> harness-render-agents-md -> harness-review -> harness-eval
-        |                                                              |
-        +------------ feedback to harness-propose on next run ---------+
+harness-analyze -> harness-propose -> harness-render-agents-md -> harness-emit-code -> harness-review -> harness-eval
+        |                                                                                |
+        +------------------ feedback to harness-propose on next run ---------------------+
 ```
 
 The loop closes: `harness-eval` writes an output whose `diff_from_previous`
@@ -74,13 +76,16 @@ Every JSON output is wrapped in a common envelope:
   "$schema": "<stage>.schema.json#/$defs/output",
   "contract_version": "0.1.0",
   "run_id": "<uuid>",
-  "stage": "<one of: analyze | propose | render | review | eval>",
+  "stage": "<one of: analyze | propose | render | emit-code | review | eval>",
   "produced_at": "<iso-8601>",
   "data": { ...stage-specific fields... }
 }
 ```
 
-`stage` is a single value, not a union. The five values are pinned by each
+**Note:** The `emit-code` stage does NOT write a `.harness-kit/emit-code.json`
+envelope — it writes artifacts directly to disk (described in its own contract).
+
+`stage` is a single value, not a union. The six values are pinned by each
 schema's `stage` `const`. Consumers MUST refuse to proceed if
 `contract_version` is outside their supported range. Patch updates are
 assumed compatible; minor updates break.
@@ -120,7 +125,24 @@ a subset.
 embeds a copy at `<stage>/references/contract.md`. The root file is the
 canonical human index.
 
+## Emit-code awareness (v0.3.0)
+
+The eval stage runs AFTER the review stage, so emitted code files are present
+on disk and available for evaluation. This enables:
+
+- Tier-1 validation verification: check that emitted files exist and exports are
+  declared (mirrors the emit-code stage's own Tier-1 checks)
+- Tier-2 validation: project-level compilation checks (e.g. `tsc --noEmit`)
+  can be incorporated into the eval score
+- Emitted code quality metrics: diff size, style compliance, test coverage of
+  generated code
+
+### Envelope
+
+The eval stage produces the standard envelope at
+`<repo-root>/.harness-kit/eval.json`.
+
 ## License
 
-MIT. See `LICENSE`. **Disclaimer:** `contract_version: 0.2.0` is unstable.
+MIT. See `LICENSE`. **Disclaimer:** `contract_version: 0.3.0` is unstable.
 Breaking changes without a migration path are possible until `1.0.0`.

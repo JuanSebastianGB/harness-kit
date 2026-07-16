@@ -70,3 +70,36 @@ a byte-identical re-run gate. Run the same fixture 3 times; if all 3 sha256
 hashes match, keep the per-run score. If any hash diverges, score is `0.0`.
 This cross-references the determinism invariant in `kit-contract.md`
 (§Sandbox & Sensors — Canonicalization rules).
+
+## Emit-code detectors (v0.3.0)
+
+The following detectors fire during the emit-code evaluation step. They are
+not golden-suite cases — they apply penalties that adjust the eval score
+when emitted code quality degrades.
+
+| Name | Trigger | Severity | Description |
+|------|---------|----------|-------------|
+| `emit_tier1_manifest_missing` | manifest.json doesn't exist | warn | Cannot evaluate emitted code. v0.2.0 compat — skip. |
+| `emit_tier1_manifest_invalid` | manifest.json fails schema validation | error | Manifest is malformed. Re-emit from render stage. |
+| `emit_tier1_file_missing` | A file from manifest.files[] doesn't exist | error | Emit stage skipped or failed silently. |
+| `emit_tier1_exports_mismatch` | Exported symbols don't match manifest.exports | warn | Module interface drifts from contract. |
+| `emit_tier2_compile_error` | tsc --noEmit returns non-zero | error | Emitted TypeScript doesn't compile. |
+| `emit_tier2_import_resolve_fail` | Dynamic import throws | error | Module cannot be loaded at runtime. |
+
+### Emit-code scoring
+
+The emit-code evaluation produces an `emit_code_penalty` that is independent
+of the golden suite score:
+
+- No manifest → `penalty = 0` (v0.2.0 compat, detector fires at `warn`)
+- All Tier-1 pass → no penalty from Tier-1
+- Any Tier-1 fail → `-20`
+- All Tier-2 pass (or language is not TypeScript, so Tier-2 is skipped) → no
+  penalty from Tier-2
+- Any Tier-2 fail → cumulative `-50` (adds `-30` to Tier-1 penalty)
+- All checks pass → `penalty = 0`
+
+The penalty is recorded as `emit_code_penalty` in the eval output alongside
+`golden_suite_score`. A negative value indicates compliance issues with
+the emitted code that the golden suite alone does not surface. The penalty
+is always `0` when no manifest exists (pre-v0.3.0 fixtures).

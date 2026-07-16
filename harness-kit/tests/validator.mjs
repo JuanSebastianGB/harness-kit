@@ -1,6 +1,6 @@
 // Tiny JSON Schema 2020-12 validator for harness-kit schemas.
 // Supports: type, required, properties, additionalProperties, const, enum, pattern,
-// maxLength, minLength, minItems, maxItems, $defs, items.
+// maxLength, minLength, minItems, maxItems, $defs, items, anyOf.
 // Other features are no-ops.
 
 import { readFileSync } from "fs";
@@ -26,6 +26,17 @@ export function compile(rawSchema) {
       const r = resolve(schemaNode.$ref);
       if (!r) return [`${ptr || "<root>"}: $ref unresolvable: ${schemaNode.$ref}`];
       return node(r, value, ptr);
+    }
+
+    if (schemaNode.anyOf && Array.isArray(schemaNode.anyOf)) {
+      // Collect errors from each branch; if ANY branch passes, return no errors.
+      const branchErrors = [];
+      for (let i = 0; i < schemaNode.anyOf.length; i++) {
+        const be = node(schemaNode.anyOf[i], value, ptr);
+        if (be.length === 0) return []; // at least one branch matched
+        branchErrors.push(...be);
+      }
+      return branchErrors; // all branches failed
     }
 
     const errs = [];

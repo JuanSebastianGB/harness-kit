@@ -46,6 +46,19 @@ existing review schema. No new statuses or verdicts are introduced.
 | Missing sandbox on write-capable agent | `tools[]` contains a write verb (`Write`, `Edit`, `Create`, `Patch`, `Delete`) AND `sandbox{}` is absent or empty | `missing-sandbox-write` | `warning` |
 | Insufficient sensors for perception purpose | `purpose` mentions perception verbs (`read`, `glob`, `grep`, `inspect`, `query`, `monitor`, `poll`, `observe`) AND `sensors` is absent or empty | `insufficient-sensors` | `warning` |
 
+## Lens: emit-code
+
+Advisory-only checks that warn about emitted code quality and consistency.
+Never gate — findings do not contribute `blocker` or `critical` severity.
+
+| Name | Trigger | Severity | Description |
+|------|---------|----------|-------------|
+| emit_missing_sandbox | Emitted function accesses filesystem without assertSandbox | warn | Every I/O function must call assertSandbox() |
+| emit_exports_mismatch | Emitted module exports don't match manifest.exports | warn | The module interface diverges from what manifest promises |
+| emit_sandbox_drift | Code accesses paths beyond allowed_paths | warn | Potential sandbox escape |
+| emit_no_review_needed | No manifest.json found | info | v0.2.0 compat — no emitted code to review |
+| emit_file_overwrite | Emitted files overwrote existing hand-written files | warn | Manual changes may be lost |
+
 ## Severity escalation
 
 - `secret leaked` → `blocker`

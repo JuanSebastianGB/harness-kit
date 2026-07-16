@@ -36,6 +36,12 @@ any good", or similar.
   harness (e.g. if project uses ruff, the harness references ruff)
 - **Drift**: files referenced in `prompt_path` exist with non-trivial content
 - **Sandbox/sensor completeness**: see `references/detectors.md#Lens: sandbox-sensor warnings`
+- **Emit-code**: review emitted code files for sandbox safety, export consistency,
+  and manifest correctness — see `references/detectors.md#Lens: emit-code`
+
+Emit-code review is **warnings only, never gates**. Findings from the emit-code
+lens do not affect the verdict (`approve`/`request-changes`) or status
+(`OK`/`BLOCKED`). Escaped-code review is a non-blocking advisory step.
 
 ## Output
 
