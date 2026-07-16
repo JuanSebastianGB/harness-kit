@@ -30,7 +30,7 @@ To use the kit on your own repo:
 ```bash
 # Install the skill into your agent (Claude Code, Cursor, OpenCode, etc.)
 # The CLI reads SKILL.md directly from the GitHub repo — no npm publish needed.
-npx skills add JuanSebastianGB/harness-kit@v0.3.0   # pin to a tag, or omit for HEAD
+npx skills add JuanSebastianGB/harness-kit   # installs HEAD (currently v0.3.0)
 ```
 
 Then invoke the `harness-kit` skill in your agent with the target repo as the path. Full 6-stage workflow is documented in [`harness-kit/README.md`](harness-kit/README.md).

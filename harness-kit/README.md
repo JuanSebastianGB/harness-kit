@@ -21,12 +21,6 @@ stack-agnostic, JSON-Schema-validated. Designed to be installed once with
 npx skills add JuanSebastianGB/harness-kit
 ```
 
-Recommended for repeatable installs: pin to a tag.
-
-```
-npx skills add JuanSebastianGB/harness-kit@v0.1.0
-```
-
 ## Quick start
 
 1. In your project repo, run `npx skills add <owner>/harness-kit`.
