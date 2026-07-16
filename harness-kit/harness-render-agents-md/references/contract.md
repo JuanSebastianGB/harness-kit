@@ -1,6 +1,6 @@
 # Harness Kit Contract
 
-`contract_version: 0.2.0` — unstable, expected to break before 1.0.
+`contract_version: 0.3.0` — unstable, expected to break before 1.0.
 
 This document is the human-readable index of the contract. The machine-readable
 schemas live in `schemas/` as one JSON Schema per pipeline stage:
@@ -10,8 +10,29 @@ schemas live in `schemas/` as one JSON Schema per pipeline stage:
 - `schemas/render.schema.json`
 - `schemas/review.schema.json`
 - `schemas/eval.schema.json`
+- `schemas/code-emission-manifest.schema.json` (v0.3.0)
 
-Each stage of the kit produces a single JSON file consumed by the next stage.
+Each stage of the kit produces JSON files consumed by the next stage. Most
+stages produce one file; the render stage produces TWO outputs.
+
+## Manifest (v0.3.0)
+
+Starting from v0.3.0, the `harness-render-agents-md` stage emits a
+`manifest.json` alongside AGENTS.md (same output directory) in addition to its
+internal envelope at `.harness-kit/render.json`. The manifest is consumed by
+the `emit-code` stage and conforms to
+`schemas/code-emission-manifest.schema.json`.
+
+The manifest describes:
+- `target_stack`: the project's language, framework, and runtime (inherited
+  from the analyze phase)
+- `files[]`: every file the render stage produced, with its path, kind, and
+  intent
+- `constraints_inherited`: aggregated sensors and sandbox constraints from all
+  agent proposals (passed through from the propose phase)
+
+The manifest is OPTIONAL — if no analyze output exists, the render stage
+skips it. Downstream stages (emit-code) gracefully handle its absence.
 
 ## Pipeline
 
@@ -19,6 +40,10 @@ Each stage of the kit produces a single JSON file consumed by the next stage.
 harness-analyze -> harness-propose -> harness-render-agents-md -> harness-review -> harness-eval
         |                                                              |
         +------------ feedback to harness-propose on next run ---------+
+                                          |
+                                     [manifest.json]
+                                          |
+                                     harness-emit-code  (v0.3.0+)
 ```
 
 The loop closes: `harness-eval` writes an output whose `diff_from_previous`
@@ -26,17 +51,31 @@ is a valid input signal for `harness-propose` on the next iteration.
 `harness-review` emits a `verdict: request-changes` whose `issues[]` feed
 back into `harness-propose` as well.
 
+Starting from v0.3.0, the render stage additionally produces a `manifest.json`
+artifact alongside AGENTS.md in the output directory. This manifest is consumed
+by the `emit-code` stage (which replaces `emit_import_resolve` in v0.3.0).
+
 ## Transport
 
-Every stage writes its output to:
+Every stage writes its internal output to:
 
 ```
 <repo-root>/.harness-kit/<stage>.json
 ```
 
 `<repo-root>` is the directory the user supplied as the project being analyzed.
-Output is gitignored. The `.harness-kit/` directory is the only state shared
+Output is gitignored. The `.harness-kit/` directory is the primary state shared
 between stages.
+
+The render stage (v0.3.0+) produces an additional public artifact:
+
+```
+<repo-root>/manifest.json
+```
+
+This file is written alongside AGENTS.md in the target project root, NOT inside
+`.harness-kit/`. It is the only stage output that lives outside the internal
+state directory. Downstream stages (emit-code) read it from the repo root.
 
 ## Sandbox & Sensors
 
@@ -74,13 +113,16 @@ Every JSON output is wrapped in a common envelope:
   "$schema": "<stage>.schema.json#/$defs/output",
   "contract_version": "0.1.0",
   "run_id": "<uuid>",
-  "stage": "<one of: analyze | propose | render | review | eval>",
+  "stage": "<one of: analyze | propose | render | emit-code | review | eval>",
   "produced_at": "<iso-8601>",
   "data": { ...stage-specific fields... }
 }
 ```
 
-`stage` is a single value, not a union. The five values are pinned by each
+**Note:** The `emit-code` stage does NOT write a `.harness-kit/emit-code.json`
+envelope — it writes artifacts directly to disk (described in its own contract).
+
+`stage` is a single value, not a union. The six values are pinned by each
 schema's `stage` `const`. Consumers MUST refuse to proceed if
 `contract_version` is outside their supported range. Patch updates are
 assumed compatible; minor updates break.
@@ -122,5 +164,5 @@ canonical human index.
 
 ## License
 
-MIT. See `LICENSE`. **Disclaimer:** `contract_version: 0.2.0` is unstable.
+MIT. See `LICENSE`. **Disclaimer:** `contract_version: 0.3.0` is unstable.
 Breaking changes without a migration path are possible until `1.0.0`.
