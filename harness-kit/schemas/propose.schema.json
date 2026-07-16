@@ -187,5 +187,5 @@
       "additionalProperties": false
     }
   },
-  "$comment": "v0.2.0 — added sensors & sandbox blocks. Replace $id at publish with: https://raw.githubusercontent.com/<owner>/harness-kit/<ref>/schemas/propose.schema.json"
+  "$comment": "v0.3.0 — added target_stack & emit-code manifest. Replace $id at publish with: https://raw.githubusercontent.com/<owner>/harness-kit/<ref>/schemas/propose.schema.json"
 }
