@@ -24,7 +24,7 @@ SOFTWARE.
 
 DISCLAIMER
 
-This kit is shipped at `contract_version: 0.1.0`. The contract is unstable.
+This kit is shipped at `contract_version: 0.3.0`. The contract is unstable.
 Breaking changes without a migration path are possible until the schema
-reaches `1.0.0`. Pin your install to a tag (e.g. `@v0.1.0`) to avoid
+reaches `1.0.0`. Pin your install to a tag (e.g. `@v0.3.0`) to avoid
 surprise breakage.

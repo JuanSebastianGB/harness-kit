@@ -1,18 +1,34 @@
 {
   "name": "harness-kit",
-  "version": "0.1.0",
-  "devDependencies": {
-    "@types/node": "^26.1.1",
-    "bun-types": "^1.3.14",
-    "typescript": "^5.0.0"
-  },
+  "version": "0.3.0",
   "description": "Curated kit of 6 SKILL.md files for building AI harnesses iteratively.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JuanSebastianGB/harness-kit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/JuanSebastianGB/harness-kit/issues"
+  },
+  "homepage": "https://github.com/JuanSebastianGB/harness-kit#readme",
+  "type": "module",
   "scripts": {
     "test": "bun test tests/",
     "test:pipeline": "bun test tests/pipeline.test.mjs",
     "test:schemas": "bun test tests/schema-gates.test.mjs",
     "test:secrets": "bun test tests/secret-scrubbing.test.mjs",
-    "test:frontmatter": "bun test tests/frontmatter-lint.test.mjs"
+    "test:frontmatter": "bun test tests/frontmatter-lint.test.mjs",
+    "test:manifest-schema": "bun test tests/manifest-schema.test.mjs",
+    "test:emit-code-roundtrip": "bun test tests/emit-code-roundtrip.test.mjs",
+    "test:adapter-presence": "bun test tests/adapter-presence.test.mjs",
+    "test:tsc-no-emit": "bun test tests/tsc-no-emit.test.mjs",
+    "test:emit-import-resolve": "bun test tests/emit-import-resolve.test.mjs",
+    "test:contract-sync": "bun test tests/diff_check_contract_sync.test.mjs",
+    "test:emit-code": "bun test tests/{tsc-no-emit,emit-import-resolve,emit-code-roundtrip,adapter-presence}.test.mjs"
   },
-  "type": "module"
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "bun-types": "^1.3.14",
+    "typescript": "^5.0.0"
+  }
 }
