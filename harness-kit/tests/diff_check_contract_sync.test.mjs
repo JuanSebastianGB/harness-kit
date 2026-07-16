@@ -1,8 +1,7 @@
 #!/usr/bin/env bun
 // diff_check_contract_sync.test.mjs
 // Ensures all 6 contract files (kit-contract.md + 5 per-stage) agree
-// on v0.2.0 and mention sensors/sandbox. Written BEFORE the contract
-// update — both MUST fail against current v0.1.0.
+// on v0.3.0 and mention sensors/sandbox.
 //
 // Run with: bun test tests/diff_check_contract_sync.test.mjs
 
@@ -30,16 +29,16 @@ const perStageContracts = STAGES.map((stage) => ({
   text: readFileSync(join(KIT, stage, "references", "contract.md"), "utf8"),
 }));
 
-test("schema $comment + all 6 contract files agree on v0.2.0", () => {
-  // Schema $comment must mention v0.2.0
-  expect(SCHEMA["$comment"]).toMatch(/v0\.2\.0/);
+test("schema $comment + all 6 contract files agree on v0.3.0", () => {
+  // Schema $comment must mention v0.3.0
+  expect(SCHEMA["$comment"]).toMatch(/v0\.3\.0/);
 
-  // Root kit-contract.md must mention v0.2.0
-  expect(KIT_CONTRACT).toMatch(/0\.2\.0/);
+  // Root kit-contract.md must mention v0.3.0
+  expect(KIT_CONTRACT).toMatch(/0\.3\.0/);
 
-  // Each per-stage contract must mention v0.2.0
+  // Each per-stage contract must mention v0.3.0
   for (const { stage, text } of perStageContracts) {
-    expect(text).toMatch(/0\.2\.0/);
+    expect(text).toMatch(/0\.3\.0/);
   }
 });
 
@@ -54,4 +53,25 @@ test("all 6 contract files mention sensors/sandbox — no drift", () => {
       /sensors/i.test(text) || /sandbox/i.test(text);
     expect(mentions).toBe(true);
   }
+});
+
+test("kit_contract_references_code_emission_manifest_schema", () => {
+  // THIS TEST MUST FAIL until kit-contract.md lists code-emission-manifest.schema.json
+  expect(KIT_CONTRACT).toMatch(/code-emission-manifest/);
+});
+
+test("emit_code_contract_references_code_emission_manifest_schema", () => {
+  // THIS TEST MUST FAIL until harness-emit-code/references/contract.md exists
+  // and references the manifest schema
+  let emitContract = null;
+  try {
+    emitContract = readFileSync(
+      join(KIT, "harness-emit-code", "references", "contract.md"),
+      "utf8",
+    );
+  } catch {
+    // emit-code stage doesn't exist yet — test fails via expect().not.toBeNull()
+  }
+  expect(emitContract).not.toBeNull();
+  expect(emitContract).toMatch(/code-emission-manifest/);
 });
