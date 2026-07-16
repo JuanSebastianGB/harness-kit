@@ -28,13 +28,12 @@ bun test            # 60 pass / 0 fail / 1 skipped
 To use the kit on your own repo:
 
 ```bash
-# From inside harness-kit/
-bun add --dev @juansebastiangb/harness-kit@v0.3.0   # pin once published
-
-bunx harness-kit run --repo ../some-target-repo     # run the 6-stage pipeline
-
-cat ../some-target-repo/.harness-kit/manifest.json  # inspect what was emitted
+# Install the skill into your agent (Claude Code, Cursor, OpenCode, etc.)
+# The CLI reads SKILL.md directly from the GitHub repo — no npm publish needed.
+npx skills add JuanSebastianGB/harness-kit@v0.3.0   # pin to a tag, or omit for HEAD
 ```
+
+Then invoke the `harness-kit` skill in your agent with the target repo as the path. Full 6-stage workflow is documented in [`harness-kit/README.md`](harness-kit/README.md).
 
 ## Project layout
 
