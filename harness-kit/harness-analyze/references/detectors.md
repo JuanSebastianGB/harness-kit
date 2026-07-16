@@ -54,6 +54,35 @@ Scan for existing action-perimeter constraints. Each match populates
 | Network egress rules | `.claude/settings.json`, `CLAUDE.md` | `networkAccess: none`, `"no internet"`, `egress: deny`, `offline` | 0.85 |
 | Approval-gated actions | `AGENTS.md`, prompt files | `requiresApproval`, `"ask before"`, `confirmSteps`, `human-in-the-loop` | 0.75 |
 
+## Target stack
+
+Detectors for the `target_stack` field (language, runtime, framework). Rules are
+evaluated in priority order; the first match populates `target_stack`. If multiple
+lockfiles contradict, emit a conflict-entry.
+
+| Detector | File(s) / Signal | `target_stack` fields | Confidence |
+|---|---|---|---|
+| Bun stack | `bun.lock` or `bun.lockb` | language: typescript, runtime: bun | 0.9 |
+| Yarn + TypeScript stack | `yarn.lock` + `tsconfig.json` | language: typescript, runtime: node | 0.8 |
+| npm + TypeScript stack | `package-lock.json` + `tsconfig.json` | language: typescript, runtime: node | 0.7 |
+| Go stack | `go.mod` | language: go, runtime: null | 0.9 |
+| Rust stack | `Cargo.toml` | language: rust, runtime: null | 0.9 |
+| Python stack | `requirements.txt` or `pyproject.toml` | language: python, runtime: null | 0.8 |
+| Ruby stack | `Gemfile` | language: ruby, runtime: null | 0.7 |
+| Unknown stack | No lockfile or marker detected | language: unknown, runtime: null | 0.2 |
+
+`target_stack.framework` is copied from `stack.framework` if non-null. The
+`target_stack` field is emitted alongside `stack`, not replacing it.
+
+### Target stack issues
+
+| Detector | Trigger | Severity | Description |
+|---|---|---|---|
+| unable to detect project language | No lockfile or marker found at depth 4 | warn | Cannot determine target language — downstream emit-code cannot select adapters. Verify the project is supported or add a lockfile. |
+| ambiguous runtime | Multiple lockfile types detected (e.g. `bun.lock` + `package-lock.json`) | warn | Conflicting runtime signals found. The first-match rule applies but may be incorrect. |
+| low_confidence_stack_detection | Final confidence < 0.5 | info | Target stack detection confidence is low. Adapter selection may be unreliable. |
+| high_confidence_stack_detected | Final confidence >= 0.8 | info | Target stack detected with high confidence. Adapter selection can proceed. |
+
 ## Conventions
 
 | Detector | File | Field |
